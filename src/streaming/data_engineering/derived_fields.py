@@ -14,12 +14,9 @@ We add total_price, tax_amount, and total as derived fields in this example.
 The producer sends raw measurements only.
 The consumer is responsible for all derived calculations.
 
-Author: Denise Case
+Author: Lindsay Foster
 Date: 2026-05
 
-OBS:
-  You can add functions and extend this file OR
-  copy it to your own module and modify your copy.
 """
 
 # === DECLARE IMPORTS ===
@@ -40,6 +37,7 @@ __all__ = [
     "compute_total_price",
     "enrich_message",
     "get_tax_rate",
+    "compute_price_usd",
 ]
 
 # === DECLARE CONSTANTS ===
@@ -80,9 +78,28 @@ def compute_tax_amount(total_price: float, tax_rate: float) -> float:
     return round(total_price * tax_rate, 2)
 
 
+def compute_price_usd(total: float, exchange_rate: float) -> float:
+    """Convert a total in local currency to USD.
+
+    Arguments:
+        total: The order total in local currency.
+        exchange_rate: The exchange rate to USD (e.g. 0.73 for CAD).
+
+    Returns:
+        The total in USD, rounded to 2 decimal places.
+    """
+    if exchange_rate <= 0:
+        LOG.warning(
+            f"Invalid exchange rate {exchange_rate!r}. Returning original total."
+        )
+        return total
+    return round(total * exchange_rate, 2)
+
+
 def enrich_message(
     row: dict[str, Any],
     region_lookup: dict[str, float],
+    currency_lookup: dict[str, float],  # ADDED FOR EXCHANGE RATE LOOKUP
 ) -> dict[str, Any]:
     """Add all derived fields to a raw message row.
 
@@ -95,6 +112,7 @@ def enrich_message(
     Arguments:
         row: A validated raw message row.
         region_lookup: A dict mapping region_id to tax_rate_pct.
+        currency_lookup: A dict mapping currency_code to exchange_rate_to_usd.
 
     Returns:
         A new dict containing all original fields plus derived fields.
@@ -106,13 +124,18 @@ def enrich_message(
     tax_rate = get_tax_rate(region_id, region_lookup)
     total_price = compute_total_price(quantity, unit_price)
     tax_amount = compute_tax_amount(total_price, tax_rate)
-
     total = round(total_price + tax_amount, 2)
+
+    currency_code = str(row.get("currency_code", "USD"))
+    exchange_rate = currency_lookup.get(currency_code, 1.0)
+    price_usd = compute_price_usd(total, exchange_rate)
+
     return {
         **row,
         "subtotal": total_price,
         "tax_amount": tax_amount,
         "total": total,
+        "price_usd": price_usd,  # ADDED THIS FOR THE USD CONVERSION
     }
 
 

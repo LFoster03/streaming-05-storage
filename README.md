@@ -234,6 +234,14 @@ To start fresh, see
 [manage topics](https://denisecase.github.io/pro-analytics-02/kafka/manage-topics/)
 to delete the topic and recreate it.
 
+## Technical Modification
+
+- Added price_usd derived field to consumer pipeline to convert all rates to usd.
+- Loaded currencies.csv as a currency lookup and passed exchange rates into enrich_message().
+- Added compute_price_usd() to derived_fields.py to convert each order total
+from local currency to USD. Added price_usd to CONSUMED_FIELDNAMES so the value
+appears in the output CSV.
+
 </details>
 
 ## Notes

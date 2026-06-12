@@ -1,0 +1,6 @@
+station_id,station_name,city,state_code,country,latitude,longitude,elevation_ft,timezone
+STN-DFW,Dallas Fort Worth Station,Dallas,TX,US,32.8998,-97.0403,596,America/Chicago
+STN-SEA,Seattle Tacoma Station,Seattle,WA,US,47.4502,-122.3088,433,America/Los_Angeles
+STN-MIA,Miami International Station,Miami,FL,US,25.7959,-80.2870,9,America/New_York
+STN-CHI,Chicago O'Hare Station,Chicago,IL,US,41.9742,-87.9073,668,America/Chicago
+STN-DEN,Denver International Station,Denver,CO,US,39.8561,-104.6737,5433,America/Denver

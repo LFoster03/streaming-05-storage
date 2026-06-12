@@ -242,6 +242,95 @@ to delete the topic and recreate it.
 from local currency to USD. Added price_usd to CONSUMED_FIELDNAMES so the value
 appears in the output CSV.
 
+## Phase 5: Weather Readings Streaming Pipeline
+
+### Scenario
+
+I built a weather readings streaming pipeline using a new dataset
+instead of the provided sales example. The pipeline streams simulated
+weather station readings through Kafka, validates them, computes
+derived fields, and stores the results in DuckDB.
+
+### Dataset
+
+I created three CSV files to drive the pipeline:
+
+- `data/weather_readings.csv`: 10 simulated weather reading events
+  from 5 US city stations (Dallas, Seattle, Miami, Chicago, Denver)
+- `data/stations.csv`: reference table with station location details
+- `data/units.csv`: reference table mapping unit systems to labels
+
+### New Files Created
+
+- `data_contract_weather_foster.py` - `src/streaming/data_validation/`
+- `derived_fields_weather_foster.py` - `src/streaming/data_engineering/`
+- `storage_weather_foster.py` - `src/streaming/storage/`
+- `kafka_producer_weather_foster.py` - `src/streaming/`
+- `kafka_consumer_weather_foster.py` - `src/streaming/`
+
+### What Changed from the Case Example
+
+The weather pipeline follows the same A/P/E structure as the sales
+example but with a different dataset and domain-specific logic:
+
+- Partition key is `station_id` instead of `region_id`
+- Reference tables are `stations.csv` and `units.csv`
+  instead of `regions.csv` and `currencies.csv`
+- Validation checks `condition` and `unit_system` against allowed sets
+- Derived fields are weather-specific (see below)
+- DuckDB summary groups by station instead of region
+- Output files are `consumed_weather.csv` and `weather.duckdb`
+
+### Derived Fields
+
+Two derived fields are computed by the consumer for each message:
+
+**heat_index**: Feels-like temperature accounting for heat and humidity.
+Uses the Rothfusz regression formula from the National Weather Service.
+Only activates when temperature >= 80F and humidity >= 40%.
+Otherwise returns the raw temperature unchanged.
+
+**wind_chill**: Feels-like temperature accounting for cold and wind.
+Uses the National Weather Service wind chill formula.
+Only activates when temperature <= 50F and wind speed > 3 mph.
+Otherwise returns the raw temperature unchanged.
+
+### What the Consumer Does to Each Message
+
+For each valid message, the consumer:
+
+1. Validates required fields against the weather data contract
+2. Checks `station_id` and `unit_system` against reference tables
+3. Computes `heat_index` and `wind_chill` from raw measurements
+4. Writes the enriched record to DuckDB and the output CSV
+5. Logs running temperature statistics (avg, min, max)
+
+### What I Observed
+
+Miami (STN-MIA) at 84.6F and 91% humidity produced a heat index
+of 100.6F, showing a 16 degree feels-like difference due to humidity.
+
+Dallas (STN-DFW) at 72.4F did not trigger either formula, so
+heat_index and wind_chill both equal the raw temperature.
+
+The Kafka topic `streaming-05-weather-foster` was kept separate
+from the sales topic so both pipelines can coexist on the same broker.
+Switching between pipelines only requires changing `KAFKA_TOPIC` in `.env`.
+
+### How to Run
+
+```bash
+# Step 1 - set KAFKA_TOPIC=streaming-05-weather-foster in .env
+# Step 2 - create the topic
+uv run python -m streaming.kafka_admin_foster --recreate
+
+# Step 3 - send weather readings to the topic
+uv run python -m streaming.kafka_producer_weather_foster
+
+# Step 4 - consume, enrich, and store the readings
+uv run python -m streaming.kafka_consumer_weather_foster
+```
+
 </details>
 
 ## Notes

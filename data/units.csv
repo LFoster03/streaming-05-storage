@@ -1,0 +1,3 @@
+unit_system,temp_unit,speed_unit,temp_label,speed_label
+imperial,F,mph,Fahrenheit,miles per hour
+metric,C,kph,Celsius,kilometers per hour

@@ -1,0 +1,4 @@
+reading_id,datetime,station_id,unit_system,temperature,humidity_pct,wind_speed,condition,device_id,heat_index,wind_chill,_kafka_key,_kafka_partition,_kafka_offset
+WR-0001,2026-05-04T08:00:00Z,STN-DFW,imperial,72.4,65,12.3,sunny,DEV-101,72.4,72.4,STN-DFW,0,0
+WR-0002,2026-05-04T08:15:00Z,STN-SEA,imperial,54.1,82,8.7,cloudy,DEV-102,54.1,54.1,STN-SEA,0,1
+WR-0003,2026-05-04T08:30:00Z,STN-MIA,imperial,84.6,91,5.2,humid,DEV-103,100.6,84.6,STN-MIA,0,2

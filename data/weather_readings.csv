@@ -1,0 +1,11 @@
+reading_id,datetime,station_id,unit_system,temperature,humidity_pct,wind_speed,condition,device_id
+WR-0001,2026-05-04T08:00:00Z,STN-DFW,imperial,72.4,65,12.3,sunny,DEV-101
+WR-0002,2026-05-04T08:15:00Z,STN-SEA,imperial,54.1,82,8.7,cloudy,DEV-102
+WR-0003,2026-05-04T08:30:00Z,STN-MIA,imperial,84.6,91,5.2,humid,DEV-103
+WR-0004,2026-05-04T08:45:00Z,STN-CHI,imperial,61.3,55,18.9,windy,DEV-104
+WR-0005,2026-05-04T09:00:00Z,STN-DFW,imperial,74.2,63,10.1,sunny,DEV-101
+WR-0006,2026-05-04T09:15:00Z,STN-DEN,imperial,58.7,40,22.4,windy,DEV-105
+WR-0007,2026-05-04T09:30:00Z,STN-SEA,imperial,55.3,79,6.5,rainy,DEV-102
+WR-0008,2026-05-04T09:45:00Z,STN-MIA,imperial,86.1,93,4.8,humid,DEV-103
+WR-0009,2026-05-04T10:00:00Z,STN-CHI,imperial,63.8,52,21.2,cloudy,DEV-104
+WR-0010,2026-05-04T10:15:00Z,STN-DEN,imperial,61.4,38,19.7,sunny,DEV-105
